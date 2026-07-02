@@ -9,14 +9,14 @@ from pathlib import Path
 # APP INFORMATION
 # ==========================================================
 
-APP_NAME = "AI Data Analyst Pro"
+APP_NAME = "AI Data analyst Assistance"
 
 APP_VERSION = "1.0.0"
 
-APP_ICON = "🤖"
+APP_ICON = "🕸️"
 
 APP_DESCRIPTION = (
-    "Upload datasets, analyze data, generate charts, "
+    "Upload datasets, analyze data, AI generate charts, "
     "ask AI questions, create reports, SQL and Python code."
 )
 
@@ -122,10 +122,8 @@ EXPORT_TYPES = [
 # ==========================================================
 # NAVIGATION MENU
 # ==========================================================
-
 MENU_ITEMS = [
     "🏠 Home",
-    "📂 Upload Dataset",
     "📑 Data Preview",
     "📋 Dataset Information",
     "🧹 Data Cleaning",
@@ -134,10 +132,7 @@ MENU_ITEMS = [
     "📈 Visualizations",
     "🔗 Join Datasets",
     "🤖 AI Chat",
-    
-    "📊 AI Chat",
-    "🧠 AI Dashboard Builder",
-
+    "🧠 AI Dashboard Builder",  # Use this name exactly
     "💼 Business Insights",
     "📄 Reports",
     "🧮 Excel Assistant",
