@@ -18,7 +18,6 @@ import plotly.express as px
 
 from modules.config import *
 
-
 from modules.session_manager import (
     initialize_session,
     add_dataset,
@@ -26,8 +25,6 @@ from modules.session_manager import (
     get_dataset_names,
     set_active_dataset
 )
-
-# ... rest of your code ...
 
 from modules.loader import load_file
 
@@ -96,11 +93,7 @@ st.set_page_config(
 )
 
 # ==========================================================
-# CUSTOM STYLING (THEME)
-# ==========================================================
-
-# ==========================================================
-# CUSTOM STYLING (MODERN SaaS LOOK)
+# CUSTOM CSS STYLING
 # ==========================================================
 
 st.markdown("""
@@ -151,11 +144,9 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-
 # ==========================================================
 # SESSION
 # ==========================================================
-initialize_session()
 
 initialize_session()
 
@@ -1092,105 +1083,48 @@ elif page == "📤 Export":
 
         )
 
+# ==========================================================
+# 🧠 AUTO DASHBOARD BUILDER (PROMPT BASED)
+# ==========================================================
 
 # ==========================================================
-# 🧠 AUTO DASHBOARD BUILDER (ONE CLICK AI)
+# 📊 AUTO DASHBOARD BUILDER (PROMPT & KPI BASED)
 # ==========================================================
 
-elif page == "📊 Auto Dashboard":
+# ==========================================================
+# 🧠 AI DASHBOARD BUILDER
+# ==========================================================
 
+elif page == "🧠 AI Dashboard Builder":
     df = get_dataset()
-
     if df is None:
-
-        st.warning("Upload dataset first")
-
+        st.warning("Upload dataset first.")
     else:
-
         st.subheader("🧠 AI Auto Dashboard Builder")
-
-        st.write("One click generates full dashboard from your dataset")
-
-        # -----------------------------
-        # BUTTON: GENERATE DASHBOARD
-        # -----------------------------
-        if st.button("🚀 Generate Auto Dashboard"):
-
-            numeric_cols = list(df.select_dtypes(include="number").columns)
-            cat_cols = list(df.select_dtypes(exclude="number").columns)
-
-            st.divider()
-
-            # =========================
-            # KPI CARDS
-            # =========================
-            st.subheader("📊 KPI Cards")
-
-            col1, col2, col3, col4 = st.columns(4)
-
-            col1.metric("Rows", df.shape[0])
-            col2.metric("Columns", df.shape[1])
-            col3.metric("Missing", df.isnull().sum().sum())
-            col4.metric("Duplicates", df.duplicated().sum())
-
-            st.divider()
-
-            # =========================
-            # AUTO CHART 1
-            # =========================
-            st.subheader("📈 Auto Visualizations")
-
-            if len(numeric_cols) > 0:
-
-                col = numeric_cols[0]
-
-                st.write(f"📊 Distribution of {col}")
-
-                fig1 = px.histogram(df, x=col)
-
-                st.plotly_chart(fig1, use_container_width=True)
-
-            # =========================
-            # AUTO CHART 2
-            # =========================
-            if len(numeric_cols) >= 2:
-
-                st.write("📊 Correlation Scatter")
-
-                fig2 = px.scatter(df, x=numeric_cols[0], y=numeric_cols[1])
-
-                st.plotly_chart(fig2, use_container_width=True)
-
-            # =========================
-            # PIE CHART (CATEGORY)
-            # =========================
-            if len(cat_cols) > 0:
-
-                col = cat_cols[0]
-
-                st.write(f"📊 Category Distribution: {col}")
-
-                fig3 = px.pie(df, names=col)
-
-                st.plotly_chart(fig3, use_container_width=True)
-    
-
-            # =========================
-            # AI INSIGHT TEXT
-            # =========================
-            st.divider()
-
-            st.subheader("🧠 AI Insights")
-
-            st.write(
-                "• Dataset contains structured tabular data\n"
-                "• Numerical columns detected for analytics\n"
-                "• Categorical segmentation available\n"
-                "• Ready for business reporting"
-            )
-
-            st.success("Dashboard generated successfully 🚀")
-
+        
+        # This is your Search Bar / Prompt Input
+        user_prompt = st.text_input("Enter KPIs or Analysis requirements (e.g., 'Show total sales by region')", key="dashboard_search")
+        
+        if user_prompt:
+            with st.spinner("Analyzing data..."):
+                try:
+                    df_sample = df.head(10).to_csv(index=False)
+                    system_instr = "You are a data expert. Return ONLY valid JSON: [{'chart': 'bar'|'line'|'pie', 'x': 'col1', 'y': 'col2', 'title': 'Insight Title'}, ...]"
+                    
+                    response = ask_ai(df_sample, f"{system_instr} Prompt: {user_prompt}", mode="dashboard")
+                    
+                    start = response.find('[')
+                    end = response.rfind(']') + 1
+                    charts = json.loads(response[start:end])
+                    
+                    for chart in charts:
+                        st.write(f"### {chart.get('title')}")
+                        if chart['chart'] == 'bar': st.plotly_chart(px.bar(df, x=chart['x'], y=chart['y']), use_container_width=True)
+                        elif chart['chart'] == 'line': st.plotly_chart(px.line(df, x=chart['x'], y=chart['y']), use_container_width=True)
+                        elif chart['chart'] == 'pie': st.plotly_chart(px.pie(df, names=chart['x'], values=chart['y']), use_container_width=True)
+                
+                except Exception as e:
+                    st.error(f"Could not generate dashboard: {e}")
 
 # ==========================================================
 # SETTINGS
@@ -1295,17 +1229,12 @@ elif page == "🤖 AI Chat":
 
             st.divider()
 
-            # -------------------------
-            # SAFE JSON PARSING FIX
-            # -------------------------
             try:
                 result = json.loads(response)
 
-                # TEXT RESPONSE
                 if result.get("type") == "text":
                     st.success(result.get("answer", ""))
 
-                # CHART RESPONSE
                 elif result.get("type") == "chart":
 
                     st.success(result.get("explanation", ""))
@@ -1334,7 +1263,6 @@ elif page == "🤖 AI Chat":
                     st.write(response)
 
             except Exception:
-                # fallback if AI returns normal text or broken JSON
                 st.write(response)
 
 
@@ -1366,16 +1294,9 @@ else:
 # FINAL SAFETY FIXES (SESSION + MODEL SCORE FIX)
 # ==========================================================
 
-# --------------------------
-# Ensure relationships exist
-# --------------------------
 if "relationships" not in st.session_state:
     st.session_state.relationships = []
 
-
-# --------------------------
-# FIX model_score ERROR SAFETY
-# --------------------------
 def safe_model_score():
     try:
         return model_score(
@@ -1386,16 +1307,10 @@ def safe_model_score():
         return 0
 
 
-# --------------------------
-# OPTIONAL GLOBAL FOOTER
-# --------------------------
 st.markdown("---")
 st.caption("🚀 AI Data Analyst Pro | Fully Built System")
 
 
-# --------------------------
-# DEBUG PANEL (optional)
-# --------------------------
 with st.expander("🔧 Debug Info"):
 
     st.write("Datasets:", len(st.session_state.datasets))

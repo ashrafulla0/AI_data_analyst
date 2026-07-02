@@ -134,7 +134,10 @@ MENU_ITEMS = [
     "📈 Visualizations",
     "🔗 Join Datasets",
     "🤖 AI Chat",
-    "📊 Auto Dashboard",
+    
+    "📊 AI Chat",
+    "🧠 AI Dashboard Builder",
+
     "💼 Business Insights",
     "📄 Reports",
     "🧮 Excel Assistant",
@@ -144,3 +147,4 @@ MENU_ITEMS = [
     "⚙ Settings",
     "ℹ About"
 ]
+
