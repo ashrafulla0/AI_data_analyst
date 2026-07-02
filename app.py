@@ -93,6 +93,24 @@ st.set_page_config(
 )
 
 # ==========================================================
+# LOGO IN SIDEBAR
+# ==========================================================
+with st.sidebar:
+    # Adjust the number (e.g., 100, 150, 200) to change the size
+    st.image("assets/ai.png", width=200) 
+    st.markdown("---") # This creates a nice line separator
+    st.markdown("""
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap');
+    </style>
+    <div style="margin-top: 2px;">
+        <h1 style="font-size: 30px; color: #FFFFFF; margin-bottom: 0px; font-family: 'Algerian', serif;">DATA ANALYTICS</h1>
+        <p style="font-size: 18px; color: #CCCCCC; font-family: 'Dancing Script', cursive; font-style: italic;">
+            Power of finding patterns and defining insights
+        </p>
+    </div>
+""", unsafe_allow_html=True)
+# ==========================================================
 # CUSTOM CSS STYLING
 # ==========================================================
 
