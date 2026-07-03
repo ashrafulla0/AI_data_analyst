@@ -284,3 +284,31 @@ def model_score():
     score += len(relationships) * 12
 
     return min(score, 100)
+
+import pandas as pd
+
+# ==========================================================
+# MERGE TABLES
+# ==========================================================
+
+def merge_tables(
+    left_df,
+    right_df,
+    left_column,
+    right_column,
+    join_type="inner"
+):
+    """
+    Merge two tables using the selected relationship.
+    """
+
+    merged = pd.merge(
+        left_df,
+        right_df,
+        left_on=left_column,
+        right_on=right_column,
+        how=join_type,
+        suffixes=("_left", "_right")
+    )
+
+    return merged

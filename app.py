@@ -13,6 +13,7 @@ import json
 import plotly.express as px
 from modules.excel_merger import run_excel_merger
 from replace_values import run_replace_values
+from modules.sql_generator import run_sql_generator
 # ==========================================================
 # IMPORT MODULES
 # ==========================================================
@@ -72,14 +73,14 @@ from modules.exporter import (
 
 from modules.data_model import (
     detect_primary_keys,
-    detect_foreign_keys,
     recommend_relationships,
     auto_build_relationships,
     add_relationship,
     delete_relationship,
     save_model,
     load_model,
-    model_score
+    model_score,
+    merge_tables
 )
 
 # ==========================================================
@@ -563,66 +564,87 @@ elif page == "🗂 Data Model":
 
         st.subheader("Manual Relationship")
 
-        table_names = list(datasets.keys())
+table_names = list(datasets.keys())
 
-        left_table = st.selectbox(
-            "Left Table",
-            table_names
+left_table = st.selectbox(
+    "Left Table",
+    table_names
+)
+
+left_column = st.selectbox(
+    "Left Column",
+    datasets[left_table].columns
+)
+
+right_table = st.selectbox(
+    "Right Table",
+    table_names
+)
+
+right_column = st.selectbox(
+    "Right Column",
+    datasets[right_table].columns
+)
+
+card = st.selectbox(
+    "Cardinality",
+    [
+        "1 : 1",
+        "1 : M",
+        "M : 1",
+        "M : M"
+    ]
+)
+
+# ===========================
+# CREATE RELATIONSHIP
+# ===========================
+
+if st.button("Create Relationship"):
+
+    ok = add_relationship(
+        left_table,
+        left_column,
+        right_table,
+        right_column,
+        card
+    )
+
+    if ok:
+
+        st.success("✅ Relationship Created Successfully")
+
+        left_df = datasets[left_table]
+        right_df = datasets[right_table]
+
+        merged_df = merge_tables(
+            left_df,
+            right_df,
+            left_column,
+            right_column
         )
 
-        left_column = st.selectbox(
-            "Left Column",
-            datasets[left_table].columns
+        # Save merged dataframe
+        st.session_state["merged_df"] = merged_df
+
+        st.subheader("📊 Merged Data Preview")
+
+        st.dataframe(
+            merged_df,
+            use_container_width=True,
+            height=450
         )
 
-        right_table = st.selectbox(
-            "Right Table",
-            table_names
+        st.download_button(
+            "⬇ Download Merged Dataset",
+            data=merged_df.to_csv(index=False),
+            file_name="merged_dataset.csv",
+            mime="text/csv"
         )
 
-        right_column = st.selectbox(
-            "Right Column",
-            datasets[right_table].columns
-        )
+    else:
 
-        card = st.selectbox(
-
-            "Cardinality",
-
-            [
-                "1 : 1",
-                "1 : M",
-                "M : 1",
-                "M : M"
-            ]
-        )
-
-        if st.button("Create Relationship"):
-
-            ok = add_relationship(
-
-                left_table,
-                left_column,
-
-                right_table,
-                right_column,
-
-                card
-            )
-
-            if ok:
-
-                st.success(
-                    "Relationship created."
-                )
-
-                st.rerun()
-
-            else:
-
-                st.warning(
-                    "Relationship already exists."
-                )
+        st.warning("⚠ Relationship already exists.")
 
         st.divider()
 
@@ -845,57 +867,8 @@ elif page == "🤖 AI Chat":
 # ==========================================================
 # SQL GENERATOR
 # ==========================================================
-
-elif page == "🗄 SQL Generator":
-
-    df = get_dataset()
-
-    if df is None:
-
-        st.warning("Upload dataset first.")
-
-    else:
-
-        st.subheader("🗄 SQL Generator")
-
-        prompt = st.text_input(
-            "Describe the SQL query"
-        )
-
-        if st.button("Generate SQL"):
-
-            try:
-
-                df_sample = df.head(20).to_csv(index=False)
-
-                sql = ask_ai(
-                    df_sample,
-                    prompt,
-                    mode="sql"
-                )
-
-                st.code(
-                    sql,
-                    language="sql"
-                )
-
-                st.download_button(
-
-                    "Download SQL",
-
-                    sql,
-
-                    file_name="query.sql",
-
-                    mime="text/plain"
-
-                )
-
-            except Exception as e:
-
-                st.error(e)
-
-
+elif page == "🛢️ SQL Generator":
+    run_sql_generator(df)
 # ==========================================================
 # PYTHON GENERATOR
 # ==========================================================
