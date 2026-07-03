@@ -11,7 +11,8 @@ import plotly.express as px
 import plotly.express as px
 import json
 import plotly.express as px
-
+from modules.excel_merger import run_excel_merger
+from replace_values import run_replace_values
 # ==========================================================
 # IMPORT MODULES
 # ==========================================================
@@ -91,6 +92,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
 
 # ==========================================================
 # LOGO IN SIDEBAR
@@ -267,6 +269,8 @@ if page == "🏠 Home":
         APP_VERSION
 
     )
+elif page == "🔄 Replace Values":
+    run_replace_values()
 
 # ==========================================================
 # DATA PREVIEW
@@ -288,32 +292,29 @@ elif page == "📑 Data Preview":
 
         show_preview(df)
 
+
 # ==========================================================
 # DATASET INFORMATION
 # ==========================================================
 
-elif page == "📋 Dataset Information":
+elif page == "📚 Merge Excel Files":
+
+    run_excel_merger()
+
+    st.divider()
 
     df = get_dataset()
 
-    if df is None:
-
-        st.warning("Upload dataset first.")
-
-    else:
-
+    if df is not None:
         quick_summary(df)
 
         st.divider()
-
         show_columns(df)
 
         st.divider()
-
         show_missing(df)
 
         st.divider()
-
         show_duplicates(df)
 # ==========================================================
 # DATA CLEANING
