@@ -134,9 +134,11 @@ MENU_ITEMS = [
     "🤖 AI Chat",
     "🧠 AI Dashboard Builder",  # Use this name exactly
     "💼 Business Insights",
+    "🧹 AI ETL Preview",
     "📄 Reports",
     "🧮 Excel Assistant",
     "📚 Merge Excel Files",
+    
     "🔄 Replace Values",
     "🛢️ SQL Generator",
     "🐍 Python Generator",

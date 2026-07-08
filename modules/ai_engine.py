@@ -21,7 +21,6 @@ client = Groq(
     api_key=GROQ_API_KEY
 )
 
-
 # ==========================
 # AI Engine
 # ==========================
@@ -31,6 +30,7 @@ def ask_ai(df_sample, question, mode="chat"):
     # -------------------------
     # SQL Generator
     # -------------------------
+
     if mode == "sql":
 
         prompt = f"""
@@ -42,7 +42,7 @@ Dataset:
 User Question:
 {question}
 
-Generate only SQL query.
+Generate ONLY the SQL query.
 
 Do not explain.
 """
@@ -50,6 +50,7 @@ Do not explain.
     # -------------------------
     # Python Generator
     # -------------------------
+
     elif mode == "python":
 
         prompt = f"""
@@ -61,7 +62,7 @@ Dataset:
 User Question:
 {question}
 
-Generate only Python code.
+Generate ONLY Python code.
 
 Do not explain.
 """
@@ -69,6 +70,7 @@ Do not explain.
     # -------------------------
     # Excel Formula Generator
     # -------------------------
+
     elif mode == "excel":
 
         prompt = f"""
@@ -83,12 +85,13 @@ Return:
 2. Explanation
 3. Example
 
-Keep answer professional.
+Keep the answer professional.
 """
 
     # -------------------------
     # AI Chat
     # -------------------------
+
     else:
 
         prompt = f"""

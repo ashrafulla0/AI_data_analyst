@@ -14,6 +14,11 @@ import plotly.express as px
 from modules.excel_merger import run_excel_merger
 from replace_values import run_replace_values
 from modules.sql_generator import run_sql_generator
+from modules.preview_engine import PreviewEngine
+import pandas as pd
+from modules.etl_preview import run_etl_preview
+from modules.dax_generator import run_dax_generator
+
 # ==========================================================
 # IMPORT MODULES
 # ==========================================================
@@ -293,6 +298,14 @@ elif page == "📑 Data Preview":
 
         show_preview(df)
 
+#=============================================
+#Dax geNERATOR
+#=====================
+
+elif page == "📊 AI DAX Generator":
+
+    run_dax_generator()
+
 
 # ==========================================================
 # DATASET INFORMATION
@@ -468,6 +481,11 @@ elif page == "📊 Statistics":
             use_container_width=True
         )
 
+#=========================================
+# Etl tool apge
+#==========================================
+
+
 
 # ==========================================================
 # DATA MODELING
@@ -564,87 +582,85 @@ elif page == "🗂 Data Model":
 
         st.subheader("Manual Relationship")
 
-table_names = list(datasets.keys())
+        table_names = list(datasets.keys())
 
-left_table = st.selectbox(
-    "Left Table",
-    table_names
-)
-
-left_column = st.selectbox(
-    "Left Column",
-    datasets[left_table].columns
-)
-
-right_table = st.selectbox(
-    "Right Table",
-    table_names
-)
-
-right_column = st.selectbox(
-    "Right Column",
-    datasets[right_table].columns
-)
-
-card = st.selectbox(
-    "Cardinality",
-    [
-        "1 : 1",
-        "1 : M",
-        "M : 1",
-        "M : M"
-    ]
-)
-
-# ===========================
-# CREATE RELATIONSHIP
-# ===========================
-
-if st.button("Create Relationship"):
-
-    ok = add_relationship(
-        left_table,
-        left_column,
-        right_table,
-        right_column,
-        card
-    )
-
-    if ok:
-
-        st.success("✅ Relationship Created Successfully")
-
-        left_df = datasets[left_table]
-        right_df = datasets[right_table]
-
-        merged_df = merge_tables(
-            left_df,
-            right_df,
-            left_column,
-            right_column
+        left_table = st.selectbox(
+            "Left Table",
+            table_names
         )
 
-        # Save merged dataframe
-        st.session_state["merged_df"] = merged_df
-
-        st.subheader("📊 Merged Data Preview")
-
-        st.dataframe(
-            merged_df,
-            use_container_width=True,
-            height=450
+        left_column = st.selectbox(
+            "Left Column",
+            datasets[left_table].columns
         )
 
-        st.download_button(
-            "⬇ Download Merged Dataset",
-            data=merged_df.to_csv(index=False),
-            file_name="merged_dataset.csv",
-            mime="text/csv"
+        right_table = st.selectbox(
+            "Right Table",
+            table_names
         )
 
-    else:
+        right_column = st.selectbox(
+            "Right Column",
+            datasets[right_table].columns
+        )
 
-        st.warning("⚠ Relationship already exists.")
+        card = st.selectbox(
+            "Cardinality",
+            [
+                "1 : 1",
+                "1 : M",
+                "M : 1",
+                "M : M"
+            ]
+        )
+
+        # ===========================
+        # CREATE RELATIONSHIP
+        # ===========================
+
+        if st.button("Create Relationship"):
+
+            ok = add_relationship(
+                left_table,
+                left_column,
+                right_table,
+                right_column,
+                card
+            )
+
+            if ok:
+
+                st.success("✅ Relationship Created Successfully")
+
+                left_df = datasets[left_table]
+                right_df = datasets[right_table]
+
+                merged_df = merge_tables(
+                    left_df,
+                    right_df,
+                    left_column,
+                    right_column
+                )
+
+                st.session_state["merged_df"] = merged_df
+
+                st.subheader("📊 Merged Data Preview")
+
+                st.dataframe(
+                    merged_df,
+                    use_container_width=True,
+                    height=450
+                )
+
+                st.download_button(
+                    "⬇ Download Merged Dataset",
+                    data=merged_df.to_csv(index=False),
+                    file_name="merged_dataset.csv",
+                    mime="text/csv"
+                )
+
+            else:
+                st.warning("⚠ Relationship already exists.")
 
         st.divider()
 
@@ -704,6 +720,12 @@ if st.button("Create Relationship"):
         )
 
 # ==========================================================
+# AI DATA COPILOT
+# ==========================================================
+
+
+
+# ==========================================================
 # VISUALIZATIONS
 # ==========================================================
 
@@ -720,7 +742,19 @@ elif page == "📈 Visualizations":
         st.subheader("📈 Interactive Visualizations")
 
         show_visualizations(df)
+#========================================
+#ETL PREVIEW PAGE
+#========================================
+# ==========================================================
+# AI ETL PREVIEW
+# ==========================================================
+# ==========================================================
+# AI ETL PREVIEW
+# ==========================================================
 
+elif page == "🧹 AI ETL Preview":
+
+    run_etl_preview()
 
 # ==========================================================
 # JOIN DATASETS
